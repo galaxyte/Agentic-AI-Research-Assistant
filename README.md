@@ -137,3 +137,59 @@ Frontend will be available at: `http://localhost:3000`
    - Confidence scores
    - Fact validation status
 
+## ☁️ Deploy on Render (Monorepo)
+
+This repository includes a `render.yaml` Blueprint to deploy both the `backend` (FastAPI) and `frontend` (Vite) on Render from a single repo.
+
+### Prerequisites
+
+- A Render account
+- Your API keys ready:
+  - `OPENAI_API_KEY`
+  - `TAVILY_API_KEY`
+  - Optional: `WEAVIATE_URL` and `WEAVIATE_API_KEY` (use Weaviate Cloud Services or any hosted Weaviate)
+
+### One-time Setup
+
+1. Commit/push your repo to GitHub or GitLab.
+2. Ensure the root contains `render.yaml` (already included).
+3. (Optional but recommended) Create a `.env` locally using the example below for reference only.
+
+### Deploy Steps
+
+1. In Render, click New → Blueprint → Connect your repo.
+2. Render will read `render.yaml` and create two web services:
+   - `agentic-backend` (Python/FastAPI on port 8000)
+   - `agentic-frontend` (Node/Vite preview on port 3000)
+3. Set the environment variables in Render for `agentic-backend`:
+   - `OPENAI_API_KEY`
+   - `TAVILY_API_KEY`
+   - `WEAVIATE_URL` (e.g., your WCS endpoint) and `WEAVIATE_API_KEY` if required
+   - Optional: `FRONTEND_URL` (set to your frontend’s public URL to lock down CORS)
+4. The frontend service receives `VITE_BACKEND_URL` (and `VITE_API_URL` for compatibility) automatically via the Blueprint, pointing to the backend URL.
+5. Click “Apply” to deploy. Render will build both services and start them.
+
+### Post-Deploy
+
+- Backend health check: `GET https://<backend-onrender-url>/health`
+- Frontend live URL: `https://<frontend-onrender-url>`
+- CORS: Backend allows either the explicit `FRONTEND_URL` you set, or any `*.onrender.com` domain by regex, plus `*` in dev if `FRONTEND_URL` is unset.
+
+### Environment Variables Reference
+
+Create a root `.env` based on this example (do not commit secrets):
+
+```env
+OPENAI_API_KEY=
+TAVILY_API_KEY=
+WEAVIATE_URL=
+WEAVIATE_API_KEY=
+FRONTEND_URL=
+VITE_BACKEND_URL=
+VITE_API_URL=
+```
+
+Notes:
+- The frontend code reads `VITE_API_URL`; the Blueprint also sets `VITE_BACKEND_URL` and mirrors it to `VITE_API_URL` for compatibility.
+- When using Weaviate Cloud (WCS), use its HTTPS URL and API key.
+

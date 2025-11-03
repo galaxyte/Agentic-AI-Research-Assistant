@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: agentic-backend
+    env: python
+    rootDir: backend
+    plan: free
+    autoDeploy: true
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: WEAVIATE_URL
+        sync: false
+      - key: WEAVIATE_API_KEY
+        sync: false
+      # Optional: lock down CORS to a specific frontend origin
+      - key: FRONTEND_URL
+        sync: false
+
+  - type: web
+    name: agentic-frontend
+    env: node
+    rootDir: frontend
+    plan: free
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm run preview -- --host 0.0.0.0 --port 3000
+    envVars:
+      # Primary env for this app
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: agentic-backend
+          property: url
+      # Also set VITE_API_URL for current codebase compatibility
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: agentic-backend
+          property: url
+

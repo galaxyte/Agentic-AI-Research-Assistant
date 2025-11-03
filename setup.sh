@@ -1,9 +1,4 @@
-#!/bin/bash
-
-# Agentic AI Research Assistant - Setup Script
-# This script automates the initial setup process
-
-set -e  # Exit on error
+set -e  
 
 echo "🚀 Agentic AI Research Assistant - Setup"
 echo "=========================================="

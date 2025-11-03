@@ -63,9 +63,14 @@ app = FastAPI(
 )
 
 # CORS middleware
+# Prefer a specific frontend origin in production; fall back to permissive for local/dev.
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+ALLOWED_ORIGINS = [FRONTEND_URL] if FRONTEND_URL else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https://.*\\.onrender\\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
