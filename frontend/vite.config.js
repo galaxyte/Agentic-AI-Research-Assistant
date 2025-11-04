@@ -13,6 +13,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+  },
+  // Allow Render preview hostname for production preview server
+  preview: {
+    allowedHosts: true
   }
 })
 
